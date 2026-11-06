@@ -169,23 +169,9 @@ def main():
         pitch = preds["pitch_pred"][0].cpu().numpy()
         energy = preds["energy_pred"][0].cpu().numpy()
 
-        # Generate high-fidelity speech audio
+        # Invert predicted Mel-spectrogram to audio waveform via Griffin-Lim
         wav_path = os.path.join(audio_out_dir, f"{sample_id}.wav")
-        try:
-            import asyncio
-            import edge_tts
-            temp_mp3 = os.path.join(audio_out_dir, f"temp_{sample_id}.mp3")
-            async def _synth():
-                comm = edge_tts.Communicate(text, "en-IN-PrabhatNeural")
-                await comm.save(temp_mp3)
-            asyncio.run(_synth())
-            audio, _ = librosa.load(temp_mp3, sr=config["audio"]["sampling_rate"], mono=True)
-            if os.path.exists(temp_mp3):
-                os.remove(temp_mp3)
-            audio = librosa.util.normalize(audio) * 0.95
-        except Exception:
-            # Fallback to Griffin-Lim mel inversion
-            audio = ap.mel_to_audio(postnet_mel)
+        audio = ap.mel_to_audio(postnet_mel)
 
         sf.write(wav_path, audio, config["audio"]["sampling_rate"], subtype="PCM_16")
         print(f"[*] [{sample_id}] Generated audio: {wav_path} (Duration: {len(audio)/config['audio']['sampling_rate']:.2f}s)")
