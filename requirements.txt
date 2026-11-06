@@ -97,3 +97,4 @@ tzdata==2026.6
 urllib3==2.8.0
 xxhash==4.0.2
 yarl==1.25.1
+edge-tts==7.3.1
