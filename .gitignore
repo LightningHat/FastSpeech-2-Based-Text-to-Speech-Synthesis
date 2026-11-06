@@ -1,0 +1,19 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Large Datasets and Processed Tensors
+*/data/
+data/
+*.npz
+
+# Checkpoint binaries exceeding GitHub 100MB limit
+# (Use Git LFS or external download links as per README)
+English/checkpoints/*.pth
+Telugu/checkpoints/*.pth
+
+# OS files
+.DS_Store
+Thumbs.db
