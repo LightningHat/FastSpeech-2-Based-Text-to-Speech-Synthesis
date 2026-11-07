@@ -228,7 +228,7 @@ class VarianceAdaptor(nn.Module):
             duration_rounded = duration_target
         else:
             duration_rounded = torch.clamp(
-                torch.round(torch.exp(log_duration_prediction) - 1) * d_control, min=1
+                torch.round((torch.exp(log_duration_prediction) - 1) * d_control), min=1
             )
             x_expanded = self.length_regulator(x, duration_rounded, max_len)
             mel_mask = get_mask_from_lengths(
@@ -488,9 +488,10 @@ class FastSpeech2Loss(nn.Module):
         mel_loss = self.mae_loss(mel_output.masked_select(mel_mask_3d), mel_targets.masked_select(mel_mask_3d))
         postnet_loss = self.mae_loss(postnet_output.masked_select(mel_mask_3d), mel_targets.masked_select(mel_mask_3d))
 
-        # Variance losses
-        pitch_loss = self.mse_loss(pitch_pred.masked_select(mel_mask), pitch_targets.masked_select(mel_mask))
-        energy_loss = self.mse_loss(energy_pred.masked_select(mel_mask), energy_targets.masked_select(mel_mask))
+        # Variance losses (scaled by characteristic physical std: 100 Hz for F0, 25 for Energy
+        # so gradient magnitudes match Mel L1 loss while keeping predictions in physical Hz/Energy units)
+        pitch_loss = self.mse_loss(pitch_pred.masked_select(mel_mask) / 100.0, pitch_targets.masked_select(mel_mask) / 100.0)
+        energy_loss = self.mse_loss(energy_pred.masked_select(mel_mask) / 25.0, energy_targets.masked_select(mel_mask) / 25.0)
 
         log_dur_targets = torch.log(dur_targets.float() + 1.0)
         dur_loss = self.mse_loss(log_dur_pred.masked_select(src_mask), log_dur_targets.masked_select(src_mask))

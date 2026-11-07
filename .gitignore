@@ -13,6 +13,11 @@ data/
 # (Use Git LFS or external download links as per README)
 English/checkpoints/*.pth
 Telugu/checkpoints/*.pth
+FastSpeech2_Checkpoints*
+*.zip
+build_technical_report.py
+
+
 
 # OS files
 .DS_Store

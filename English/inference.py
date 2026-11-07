@@ -20,7 +20,7 @@ TEST_SENTENCES_EN = [
     ("E1", "The antidisestablishmentarianism movement gained considerable momentum during the parliamentary proceedings."),
     ("E2_a", "The orchestra's conduct during the ceremony was praised by the audience."),
     ("E2_b", "The researchers will conduct an experiment to evaluate the proposed method."),
-    ("E3", "The rhyth  m of the orchestra changed unexpectedly."),
+    ("E3", "The rhyth m of the orchestra changed unexpectedly."),
     ("E4", "The meeting will start at 10:45 AM on 12 November 2026, so andaroo should arrive on time.")
 ]
 
@@ -29,7 +29,6 @@ def parse_args():
     parser.add_argument("--config", type=str, default="config.yaml", help="Path to config.yaml")
     parser.add_argument("--checkpoint", type=str, default=None, help="Path to model checkpoint")
     parser.add_argument("--text", type=str, default=None, help="Custom text to synthesize")
-    parser.add_argument("--test", action="store_true", help="Run inference on all 5 benchmark test sentences")
     parser.add_argument("--p_control", type=float, default=1.0, help="Pitch control scaling factor")
     parser.add_argument("--e_control", type=float, default=1.0, help="Energy control scaling factor")
     parser.add_argument("--d_control", type=float, default=1.0, help="Duration control scaling factor")
@@ -129,11 +128,8 @@ def main():
         print(f"[*] Loading checkpoint: {ckpt_path}")
         state = torch.load(ckpt_path, map_location=device)
         model.load_state_dict(state["model_state_dict"], strict=False)
-        if "model_state_dict" in state:
-            if "variance_adaptor.pitch_bins" in state["model_state_dict"]:
-                model.variance_adaptor.pitch_bins.copy_(state["model_state_dict"]["variance_adaptor.pitch_bins"])
-            if "variance_adaptor.energy_bins" in state["model_state_dict"]:
-                model.variance_adaptor.energy_bins.copy_(state["model_state_dict"]["variance_adaptor.energy_bins"])
+        model.variance_adaptor.pitch_bins.copy_(state["model_state_dict"]["variance_adaptor.pitch_bins"])
+        model.variance_adaptor.energy_bins.copy_(state["model_state_dict"]["variance_adaptor.energy_bins"])
     else:
         print(f"[!] Warning: Checkpoint {ckpt_path} not found. Running with initialized weights for demonstration.")
 

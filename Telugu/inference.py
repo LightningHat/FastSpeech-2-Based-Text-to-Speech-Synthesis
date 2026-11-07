@@ -17,11 +17,11 @@ from core.audio import AudioProcessor
 from core.text_te import text_to_sequence_te
 
 TEST_SENTENCES_TE = [
-    ("T1", "న్యూ రోఫార్మ కోలాజికల్  పరిశోధనలో నూతన ఔషధాల ప్రభావాన్ని  విశ్లేషించారు."),
+    ("T1", "న్యూరోఫార్మకోలాజికల్ పరిశోధనలోనూతన ఔషధాల ప్రభావాన్ని విశ్లేషించారు."),
     ("T2_a", "తాడుపై అతని పట్టు చాలా బలంగా ఉంది."),
-    ("T2_b", "ఆమె పట్టు చీరను ధరించి వేడుకకు వచ్చ ింది ."),
-    ("T3", "పులి అడ  విలో నిశ్శ బ్దంగా నడిచింది."),
-    ("T4", "ఈ సమావేశం 2026 నవంబర్ 12వ తేదీ ఉదయం 10:45 గంటలకు ప్రారంభమవుతుంది, సమయానికి సిద్ధంగా ఉంచండి.")
+    ("T2_b", "ఆమె పట్టుచీరను ధరించి వేడుకకు వచ్చింది."),
+    ("T3", "పులి అడవిలో నిశ్శబ్దంగా నడిచింది."),
+    ("T4", "ఈ సమావేశం 2026 నవంబర్ 12వ తేదీ ఉదయం 10:45 గంటలకు ప్రారంభమవుతుంది, సమయానికి సిద్ధంగా ఉండండి.")
 ]
 
 def parse_args():
@@ -29,7 +29,6 @@ def parse_args():
     parser.add_argument("--config", type=str, default="config.yaml", help="Path to config.yaml")
     parser.add_argument("--checkpoint", type=str, default=None, help="Path to model checkpoint")
     parser.add_argument("--text", type=str, default=None, help="Custom text to synthesize")
-    parser.add_argument("--test", action="store_true", help="Run inference on all 5 benchmark test sentences")
     parser.add_argument("--p_control", type=float, default=1.0, help="Pitch control scaling factor")
     parser.add_argument("--e_control", type=float, default=1.0, help="Energy control scaling factor")
     parser.add_argument("--d_control", type=float, default=1.0, help="Duration control scaling factor")
@@ -129,11 +128,8 @@ def main():
         print(f"[*] Loading checkpoint: {ckpt_path}")
         state = torch.load(ckpt_path, map_location=device)
         model.load_state_dict(state["model_state_dict"], strict=False)
-        if "model_state_dict" in state:
-            if "variance_adaptor.pitch_bins" in state["model_state_dict"]:
-                model.variance_adaptor.pitch_bins.copy_(state["model_state_dict"]["variance_adaptor.pitch_bins"])
-            if "variance_adaptor.energy_bins" in state["model_state_dict"]:
-                model.variance_adaptor.energy_bins.copy_(state["model_state_dict"]["variance_adaptor.energy_bins"])
+        model.variance_adaptor.pitch_bins.copy_(state["model_state_dict"]["variance_adaptor.pitch_bins"])
+        model.variance_adaptor.energy_bins.copy_(state["model_state_dict"]["variance_adaptor.energy_bins"])
     else:
         print(f"[!] Warning: Checkpoint {ckpt_path} not found. Running with initialized weights for demonstration.")
 

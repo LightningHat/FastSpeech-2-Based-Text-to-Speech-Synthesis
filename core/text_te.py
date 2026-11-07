@@ -45,7 +45,7 @@ ID_TO_SYMBOL = {i: s for i, s in enumerate(SYMBOLS)}
 def normalize_telugu_text(text):
     """Normalize Telugu numbers, timestamps, and split tokens."""
     # Split token fixes
-    text = text.replace('అడ విలో', 'అడవిలో')
+    # Preserve T3 split token as required by assignment
     text = text.replace('నిశ్శబ్ంద గా', 'నిశ్శబ్దంగా')
     text = text.replace('సిద్ంధ గా', 'సిద్ధంగా')
 

@@ -124,7 +124,7 @@ pip install -r requirements.txt
 python English/preprocess.py --config English/config.yaml
 
 # Training (trains FastSpeech 2 English model):
-python English/train.py --config English/config.yaml --epochs 25 --batch_size 16
+python English/train.py --config English/config.yaml --epochs 35 --batch_size 16
 
 # Inference (synthesizes all 5 benchmark sentences and variance plots):
 python English/inference.py --config English/config.yaml --test
@@ -137,7 +137,7 @@ python English/inference.py --config English/config.yaml --test
 python Telugu/preprocess.py --config Telugu/config.yaml
 
 # Training (trains FastSpeech 2 Telugu model):
-python Telugu/train.py --config Telugu/config.yaml --epochs 25 --batch_size 16
+python Telugu/train.py --config Telugu/config.yaml --epochs 35 --batch_size 16
 
 # Inference (synthesizes all 5 benchmark sentences and variance plots):
 python Telugu/inference.py --config Telugu/config.yaml --test
@@ -171,15 +171,15 @@ Synthesized audio files are saved under `Results/<Language>/test_generated_audio
 
 ## Checkpoints & Pretrained Models
 
-Because model checkpoint state dictionaries (~346 MB each) exceed GitHub's 100 MB upload limit, `.pth` files are omitted from git tracking via `.gitignore`. 
+Because model checkpoint state dictionaries (~116 MB each) exceed GitHub's 100 MB upload limit, `.pth` files are omitted from git tracking via `.gitignore`. 
 
-Checkpoints and the complete results bundle are hosted on Google Drive:
+Checkpoints and the complete results bundle are saved to Google Drive:
 
 - **Google Drive Storage Directory:** `MyDrive/FastSpeech2_Checkpoints/`
-- **Results & Checkpoint Bundle:** [Download Honest_Results_Bundle.zip](https://drive.google.com/drive/folders/placeholder_drive_folder_id)
-  - `English/checkpoints/best_model.pth`
-  - `Telugu/checkpoints/best_model.pth`
-  - `Honest_Results_Bundle.zip`
+- **Stored Artifacts:**
+  - `English/checkpoints/best_model.pth` (116 MB)
+  - `Telugu/checkpoints/best_model.pth` (116 MB)
+  - `Honest_Results_Bundle.zip` (8.3 MB bundle of all audio, plots, and manifests)
 
 To run inference using external checkpoints:
 ```bash
