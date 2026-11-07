@@ -27,36 +27,87 @@ def plot_loss_curves(history, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     epochs = [h["epoch"] for h in history]
 
-    # 1. Training Loss Plot
-    plt.figure(figsize=(9, 5))
-    plt.plot(epochs, [h["train_total_loss"] for h in history], label="Total Train Loss", color="#1f77b4", lw=2)
-    plt.plot(epochs, [h["train_mel_loss"] for h in history], label="Mel Loss (MAE)", color="#ff7f0e", lw=1.5, ls="--")
-    plt.plot(epochs, [h["train_pitch_loss"] for h in history], label="Pitch Loss (MSE)", color="#2ca02c", lw=1.5, ls=":")
-    plt.plot(epochs, [h["train_energy_loss"] for h in history], label="Energy Loss (MSE)", color="#d62728", lw=1.5, ls="-.")
-    plt.plot(epochs, [h["train_dur_loss"] for h in history], label="Duration Loss (MSE)", color="#9467bd", lw=1.5)
-    plt.title("FastSpeech 2 English Training Loss Curves", fontsize=13, fontweight="bold")
-    plt.xlabel("Epoch", fontsize=11)
-    plt.ylabel("Loss", fontsize=11)
-    plt.grid(True, alpha=0.3)
-    plt.legend(frameon=True)
+    # Metrics
+    train_mel = [h["train_mel_loss"] for h in history]
+    train_dur = [h["train_dur_loss"] for h in history]
+    train_pitch = [h["train_pitch_loss"] for h in history]
+    train_energy = [h["train_energy_loss"] for h in history]
+
+    val_mel = [h["val_mel_loss"] for h in history]
+    val_dur = [h["val_dur_loss"] for h in history]
+    val_pitch = [h["val_pitch_loss"] for h in history]
+    val_energy = [h["val_energy_loss"] for h in history]
+
+    # 1. Training Loss Plot (2x2 Grid)
+    fig, axes = plt.subplots(2, 2, figsize=(11, 8.5), dpi=300)
+    fig.suptitle("FastSpeech 2 (English) - Training Loss Convergence", fontsize=14, fontweight="bold", y=0.98)
+
+    axes[0, 0].plot(epochs, train_mel, color="#2b6cb0", marker="o", markersize=4, lw=2, label="Train Mel Loss (L1)")
+    axes[0, 0].set_title("(a) Mel Spectrogram Reconstruction Loss", fontsize=11, fontweight="bold")
+    axes[0, 0].set_xlabel("Epoch", fontsize=10)
+    axes[0, 0].set_ylabel("L1 Loss", fontsize=10)
+    axes[0, 0].grid(True, linestyle="--", alpha=0.5)
+    axes[0, 0].legend(frameon=True)
+
+    axes[0, 1].plot(epochs, train_dur, color="#c53030", marker="s", markersize=4, lw=2, label="Train Duration Loss (MSE)")
+    axes[0, 1].set_title("(b) Duration Predictor Loss", fontsize=11, fontweight="bold")
+    axes[0, 1].set_xlabel("Epoch", fontsize=10)
+    axes[0, 1].set_ylabel("MSE Loss (Log Frames)", fontsize=10)
+    axes[0, 1].grid(True, linestyle="--", alpha=0.5)
+    axes[0, 1].legend(frameon=True)
+
+    axes[1, 0].plot(epochs, train_pitch, color="#2f855a", marker="^", markersize=4, lw=2, label="Train Pitch Loss (MSE)")
+    axes[1, 0].set_title("(c) Pitch (F0) Predictor Loss", fontsize=11, fontweight="bold")
+    axes[1, 0].set_xlabel("Epoch", fontsize=10)
+    axes[1, 0].set_ylabel("MSE Loss (Hz^2)", fontsize=10)
+    axes[1, 0].grid(True, linestyle="--", alpha=0.5)
+    axes[1, 0].legend(frameon=True)
+
+    axes[1, 1].plot(epochs, train_energy, color="#805ad5", marker="d", markersize=4, lw=2, label="Train Energy Loss (MSE)")
+    axes[1, 1].set_title("(d) Energy Predictor Loss", fontsize=11, fontweight="bold")
+    axes[1, 1].set_xlabel("Epoch", fontsize=10)
+    axes[1, 1].set_ylabel("MSE Loss (L2 Norm)", fontsize=10)
+    axes[1, 1].grid(True, linestyle="--", alpha=0.5)
+    axes[1, 1].legend(frameon=True)
+
     plt.tight_layout()
     train_plot_path = os.path.join(output_dir, "training_loss.png")
     plt.savefig(train_plot_path, dpi=300)
     plt.close()
     print(f"[*] Saved training loss plot to: {train_plot_path}")
 
-    # 2. Validation Loss Plot
-    plt.figure(figsize=(9, 5))
-    plt.plot(epochs, [h["val_total_loss"] for h in history], label="Total Val Loss", color="#d62728", lw=2)
-    plt.plot(epochs, [h["val_mel_loss"] for h in history], label="Val Mel Loss (MAE)", color="#ff7f0e", lw=1.5, ls="--")
-    plt.plot(epochs, [h["val_pitch_loss"] for h in history], label="Val Pitch Loss (MSE)", color="#2ca02c", lw=1.5, ls=":")
-    plt.plot(epochs, [h["val_energy_loss"] for h in history], label="Val Energy Loss (MSE)", color="#1f77b4", lw=1.5, ls="-.")
-    plt.plot(epochs, [h["val_dur_loss"] for h in history], label="Val Duration Loss (MSE)", color="#9467bd", lw=1.5)
-    plt.title("FastSpeech 2 English Validation Loss Curves", fontsize=13, fontweight="bold")
-    plt.xlabel("Epoch", fontsize=11)
-    plt.ylabel("Loss", fontsize=11)
-    plt.grid(True, alpha=0.3)
-    plt.legend(frameon=True)
+    # 2. Validation Loss Plot (2x2 Grid)
+    fig, axes = plt.subplots(2, 2, figsize=(11, 8.5), dpi=300)
+    fig.suptitle("FastSpeech 2 (English) - Validation Loss Convergence", fontsize=14, fontweight="bold", y=0.98)
+
+    axes[0, 0].plot(epochs, val_mel, color="#3182ce", marker="o", markersize=4, lw=2, linestyle="--", label="Val Mel Loss (L1)")
+    axes[0, 0].set_title("(a) Mel Spectrogram Reconstruction Loss", fontsize=11, fontweight="bold")
+    axes[0, 0].set_xlabel("Epoch", fontsize=10)
+    axes[0, 0].set_ylabel("L1 Loss", fontsize=10)
+    axes[0, 0].grid(True, linestyle="--", alpha=0.5)
+    axes[0, 0].legend(frameon=True)
+
+    axes[0, 1].plot(epochs, val_dur, color="#e53e3e", marker="s", markersize=4, lw=2, linestyle="--", label="Val Duration Loss (MSE)")
+    axes[0, 1].set_title("(b) Duration Predictor Loss", fontsize=11, fontweight="bold")
+    axes[0, 1].set_xlabel("Epoch", fontsize=10)
+    axes[0, 1].set_ylabel("MSE Loss (Log Frames)", fontsize=10)
+    axes[0, 1].grid(True, linestyle="--", alpha=0.5)
+    axes[0, 1].legend(frameon=True)
+
+    axes[1, 0].plot(epochs, val_pitch, color="#38a169", marker="^", markersize=4, lw=2, linestyle="--", label="Val Pitch Loss (MSE)")
+    axes[1, 0].set_title("(c) Pitch (F0) Predictor Loss", fontsize=11, fontweight="bold")
+    axes[1, 0].set_xlabel("Epoch", fontsize=10)
+    axes[1, 0].set_ylabel("MSE Loss (Hz^2)", fontsize=10)
+    axes[1, 0].grid(True, linestyle="--", alpha=0.5)
+    axes[1, 0].legend(frameon=True)
+
+    axes[1, 1].plot(epochs, val_energy, color="#9f7aea", marker="d", markersize=4, lw=2, linestyle="--", label="Val Energy Loss (MSE)")
+    axes[1, 1].set_title("(d) Energy Predictor Loss", fontsize=11, fontweight="bold")
+    axes[1, 1].set_xlabel("Epoch", fontsize=10)
+    axes[1, 1].set_ylabel("MSE Loss (L2 Norm)", fontsize=10)
+    axes[1, 1].grid(True, linestyle="--", alpha=0.5)
+    axes[1, 1].legend(frameon=True)
+
     plt.tight_layout()
     val_plot_path = os.path.join(output_dir, "validation_loss.png")
     plt.savefig(val_plot_path, dpi=300)

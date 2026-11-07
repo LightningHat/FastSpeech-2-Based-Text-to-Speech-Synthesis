@@ -87,8 +87,8 @@ sphinxcontrib-qthelp==2.0.0
 sphinxcontrib-serializinghtml==2.0.0
 sympy==1.13.1
 threadpoolctl==3.7.0
-torch @ file:///C:/Users/Sumit%20Chatterjee/AppData/Local/Temp/pip-unpack-cpcl2jhh/torch-2.5.1%2Bcu121-cp311-cp311-win_amd64.whl#sha256=4bcee18f00c43c815efad8efaa3bca584ffdc8d2cd35ef4c44c814f2739d9191
-torchaudio @ file:///C:/Users/Sumit%20Chatterjee/AppData/Local/Temp/pip-unpack-lda4xdoa/torchaudio-2.5.1%2Bcu121-cp311-cp311-win_amd64.whl#sha256=f9397ff9c6e8fa1b4fdc94939411ac65fe43f66d66367ee80603bc7ce10e18e2
+torch==2.5.1
+torchaudio==2.5.1
 tqdm==4.70.1
 truststore==0.10.5
 typeguard==4.6.0

@@ -38,7 +38,7 @@ class ScaledDotProductAttention(nn.Module):
     def forward(self, q, k, v, mask=None):
         attn = torch.bmm(q, k.transpose(1, 2)) / self.temperature
         if mask is not None:
-            attn = attn.masked_fill(mask, -1e9)
+            attn = attn.masked_fill(mask, torch.finfo(attn.dtype).min)
         attn = self.softmax(attn)
         output = torch.bmm(attn, v)
         return output, attn
@@ -228,7 +228,7 @@ class VarianceAdaptor(nn.Module):
             duration_rounded = duration_target
         else:
             duration_rounded = torch.clamp(
-                torch.round(torch.exp(log_duration_prediction) - 1) * d_control, min=0
+                torch.round(torch.exp(log_duration_prediction) - 1) * d_control, min=1
             )
             x_expanded = self.length_regulator(x, duration_rounded, max_len)
             mel_mask = get_mask_from_lengths(
