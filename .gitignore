@@ -21,7 +21,13 @@ build_technical_report.py
 make_report.py
 report_notes.json
 validate_submission.py
+generate_final_report.py
 Results/*/training_history.json
+Report/figures/
+Report/*.html
+tmp_extracted_imgs/
+*.txt
+*.html
 
 
 
