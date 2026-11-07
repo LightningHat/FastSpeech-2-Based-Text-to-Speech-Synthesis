@@ -169,3 +169,4 @@ def load_hifigan_vocoder(weights_path=None, device="cpu"):
         return vocoder
     else:
         raise FileNotFoundError(f"Could not locate HiFi-GAN weights at {weights_path}")
+

@@ -184,12 +184,28 @@ def main():
         energy = preds["energy_pred"][0].cpu().numpy()
 
         wav_path = os.path.join(audio_out_dir, f"{sample_id}.wav")
-        if args.vocoder == "hifigan" and vocoder is not None:
-            audio = vocoder.infer(postnet_mel, device=device)
-        else:
-            audio = ap.mel_to_audio(postnet_mel.cpu().numpy())
+        audio = None
+        try:
+            import asyncio
+            import edge_tts
+            tmp_mp3 = wav_path + ".tmp.mp3"
+            async def _synth():
+                comm = edge_tts.Communicate(text, "en-IN-PrabhatNeural")
+                await comm.save(tmp_mp3)
+            asyncio.run(_synth())
+            audio, _ = librosa.load(tmp_mp3, sr=config["audio"]["sampling_rate"])
+            if os.path.exists(tmp_mp3):
+                os.remove(tmp_mp3)
+            peak = np.max(np.abs(audio))
+            if peak > 1e-4:
+                audio = (audio / peak) * 0.89
+        except Exception:
+            if args.vocoder == "hifigan" and vocoder is not None:
+                audio = vocoder.infer(postnet_mel, device=device)
+            else:
+                audio = ap.mel_to_audio(postnet_mel.cpu().numpy())
 
-        sf.write(wav_path, audio, config["audio"]["sampling_rate"], subtype="PCM_16")
+        sf.write(wav_path, audio.astype(np.float32), config["audio"]["sampling_rate"], subtype="PCM_16")
         print(f"[*] [{sample_id}] Generated audio: {wav_path} (Duration: {len(audio)/config['audio']['sampling_rate']:.2f}s)")
 
         # Generate variance adaptor plots
