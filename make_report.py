@@ -396,7 +396,7 @@ python Telugu/inference.py  --config Telugu/config.yaml  --checkpoint Telugu/che
 python make_report.py"""
 story.append(Preformatted(cmds, CODE))
 fill("Add the exact preprocess and train commands for each language (training was run through the train_language_fast function in a Colab notebook; give the train.py command if one exists).", note("commands_note"))
-P("Configuration files: English/config.yaml, Telugu/config.yaml. Checkpoints: see the link in README.md.")
+P("Configuration files: English/config.yaml, Telugu/config.yaml. Checkpoints hosted on Google Drive: https://drive.google.com/drive/folders/17G4YMY4ce79uIVG7E7gOVIq9E0f4qVMf?usp=drive_link")
 
 # ---------------------------------------------------------------- 8
 h1("8. Tools and AI assistance")
