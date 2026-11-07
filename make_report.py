@@ -150,7 +150,6 @@ HIST = {"English": load_json("Results/English/training_history.json"),
 P("FastSpeech 2-Based Text-to-Speech Synthesis", TITLE)
 P("English (Svarah) and Telugu (IndicTTS Telugu): technical report", SUB)
 P("GitHub: https://github.com/LightningHat/FastSpeech-2-Based-Text-to-Speech-Synthesis", SUB)
-P(f"Generated {datetime.date.today().isoformat()} from the project files. Assignment deadline: 07-11-2026.", SUB)
 story.append(Spacer(1, 6))
 
 h1("Summary and honest status")
