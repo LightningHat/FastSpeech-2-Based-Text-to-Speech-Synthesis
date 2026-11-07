@@ -64,8 +64,6 @@ Telugu/checkpoints/best_model.pth
 │   ├── text_en.py               # English phoneme conversion (g2p_en)
 │   └── text_te.py               # Telugu akshara tokenizer
 ├── requirements.txt
-├── make_report.py
-├── report_notes.json
 └── README.md
 ```
 
@@ -163,11 +161,6 @@ The assignment test sentences evaluated in this project:
 
 The full technical report detailing the model architecture, training observations, loss curves, and acoustic analysis is available at:
 - [Report/Technical_Report.pdf](Report/Technical_Report.pdf)
-
-To rebuild the report:
-```bash
-python make_report.py
-```
 
 ---
 

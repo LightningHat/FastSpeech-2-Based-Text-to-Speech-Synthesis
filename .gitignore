@@ -15,7 +15,13 @@ English/checkpoints/*.pth
 Telugu/checkpoints/*.pth
 FastSpeech2_Checkpoints*
 *.zip
+
+# Local scripts and data not part of prescribed assignment deliverables
 build_technical_report.py
+make_report.py
+report_notes.json
+validate_submission.py
+Results/*/training_history.json
 
 
 
