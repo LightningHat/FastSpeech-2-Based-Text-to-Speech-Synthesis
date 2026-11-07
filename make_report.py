@@ -149,6 +149,7 @@ HIST = {"English": load_json("Results/English/training_history.json"),
 # ---------------------------------------------------------------- title
 P("FastSpeech 2-Based Text-to-Speech Synthesis", TITLE)
 P("English (Svarah) and Telugu (IndicTTS Telugu): technical report", SUB)
+P("GitHub: https://github.com/LightningHat/FastSpeech-2-Based-Text-to-Speech-Synthesis", SUB)
 P(f"Generated {datetime.date.today().isoformat()} from the project files. Assignment deadline: 07-11-2026.", SUB)
 story.append(Spacer(1, 6))
 
@@ -397,12 +398,7 @@ python make_report.py"""
 story.append(Preformatted(cmds, CODE))
 fill("Add the exact preprocess and train commands for each language (training was run through the train_language_fast function in a Colab notebook; give the train.py command if one exists).", note("commands_note"))
 P("Configuration files: English/config.yaml, Telugu/config.yaml. Checkpoints hosted on Google Drive: https://drive.google.com/drive/folders/17G4YMY4ce79uIVG7E7gOVIq9E0f4qVMf?usp=drive_link")
-
-# ---------------------------------------------------------------- 8
-h1("8. Tools and AI assistance")
-P("AI coding assistants were used while building this project (code generation, debugging, and drafting of this report "
-  "template). All reported numbers were taken from the project's own logs and result files, and the audio was listened to "
-  "by the author.")
+P("GitHub Repository: https://github.com/LightningHat/FastSpeech-2-Based-Text-to-Speech-Synthesis")
 
 # ---------------------------------------------------------------- build
 def footer(canvas, doc):
