@@ -65,7 +65,7 @@ The architecture follows FastSpeech 2 ([Ren et al., 2020](https://arxiv.org/abs/
 3. **Mel Decoder & PostNet:**
    - 4-layer FFT decoder projecting hidden representations into 80-channel mel-spectrograms.
    - 5-layer 1D convolutional PostNet with residual connections for high-frequency spectral refinement.
-   - Waveform synthesis via Griffin-Lim phase estimation (default).
+   - Waveform synthesis via pretrained universal **HiFi-GAN neural vocoder** (default), restoring natural harmonic formants, with Griffin-Lim available as an algorithmic fallback.
 
 4. **Telugu-Specific Adaptations:**
    - Unlike Latin orthographies, Telugu is an alpha-syllabic (abugida) Dravidian script where consonants carry an inherent vowel `/a/`.
@@ -126,8 +126,8 @@ python English/preprocess.py --config English/config.yaml
 # Training (trains FastSpeech 2 English model):
 python English/train.py --config English/config.yaml --epochs 35 --batch_size 16
 
-# Inference (synthesizes all 5 benchmark sentences and variance plots):
-python English/inference.py --config English/config.yaml --test
+# Inference (synthesizes all 5 benchmark sentences using HiFi-GAN):
+python English/inference.py --config English/config.yaml --vocoder hifigan
 ```
 
 ### 2. Telugu Pipeline
@@ -139,8 +139,8 @@ python Telugu/preprocess.py --config Telugu/config.yaml
 # Training (trains FastSpeech 2 Telugu model):
 python Telugu/train.py --config Telugu/config.yaml --epochs 35 --batch_size 16
 
-# Inference (synthesizes all 5 benchmark sentences and variance plots):
-python Telugu/inference.py --config Telugu/config.yaml --test
+# Inference (synthesizes all 5 benchmark sentences using HiFi-GAN):
+python Telugu/inference.py --config Telugu/config.yaml --vocoder hifigan
 ```
 
 ---

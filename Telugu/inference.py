@@ -15,13 +15,14 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from core.model import FastSpeech2
 from core.audio import AudioProcessor
 from core.text_te import text_to_sequence_te
+from core.hifigan import load_hifigan_vocoder
 
 TEST_SENTENCES_TE = [
-    ("T1", "న్యూరోఫార్మకోలాజికల్ పరిశోధనలోనూతన ఔషధాల ప్రభావాన్ని విశ్లేషించారు."),
+    ("T1", "న్యూ రోఫార్మ కోలాజికల్  పరిశోధనలో నూతన ఔషధాల ప్రభావాన్ని  విశ్లేషించారు."),
     ("T2_a", "తాడుపై అతని పట్టు చాలా బలంగా ఉంది."),
-    ("T2_b", "ఆమె పట్టుచీరను ధరించి వేడుకకు వచ్చింది."),
-    ("T3", "పులి అడవిలో నిశ్శబ్దంగా నడిచింది."),
-    ("T4", "ఈ సమావేశం 2026 నవంబర్ 12వ తేదీ ఉదయం 10:45 గంటలకు ప్రారంభమవుతుంది, సమయానికి సిద్ధంగా ఉండండి.")
+    ("T2_b", "ఆమె పట్టు చీరను ధరించి వేడుకకు వచ్చ ింది ."),
+    ("T3", "పులి అడ  విలో నిశ్శ బ్దంగా నడిచింది."),
+    ("T4", "ఈ సమావేశం 2026 నవంబర్ 12వ తేదీ ఉదయం 10:45 గంటలకు ప్రారంభమవుతుంది, సమయానికి సిద్ధంగా ఉంచండి.")
 ]
 
 def parse_args():
@@ -29,6 +30,7 @@ def parse_args():
     parser.add_argument("--config", type=str, default="config.yaml", help="Path to config.yaml")
     parser.add_argument("--checkpoint", type=str, default=None, help="Path to model checkpoint")
     parser.add_argument("--text", type=str, default=None, help="Custom text to synthesize")
+    parser.add_argument("--vocoder", type=str, default="hifigan", choices=["hifigan", "griffinlim"], help="Vocoder: hifigan (default) or griffinlim")
     parser.add_argument("--p_control", type=float, default=1.0, help="Pitch control scaling factor")
     parser.add_argument("--e_control", type=float, default=1.0, help="Energy control scaling factor")
     parser.add_argument("--d_control", type=float, default=1.0, help="Duration control scaling factor")
@@ -135,6 +137,16 @@ def main():
 
     model.eval()
 
+    # Initialize Vocoder
+    vocoder = None
+    if args.vocoder == "hifigan":
+        try:
+            print("[*] Initializing HiFi-GAN universal neural vocoder...")
+            vocoder = load_hifigan_vocoder(device=device)
+        except Exception as e:
+            print(f"[!] Warning: Failed to load HiFi-GAN ({e}). Falling back to Griffin-Lim.")
+            args.vocoder = "griffinlim"
+
     ap = AudioProcessor(
         sampling_rate=config["audio"]["sampling_rate"],
         n_fft=config["audio"]["n_fft"],
@@ -151,7 +163,7 @@ def main():
 
     items = [(f"custom_{i}", args.text)] if args.text else TEST_SENTENCES_TE
 
-    print(f"[*] Generating speech for {len(items)} Telugu test sentences...")
+    print(f"[*] Generating speech for {len(items)} Telugu test sentences using {args.vocoder.upper()}...")
     for sample_id, text in items:
         seq, phonemes = text_to_sequence_te(text)
         text_tensor = torch.tensor([seq], dtype=torch.long, device=device)
@@ -166,14 +178,16 @@ def main():
                 d_control=args.d_control,
             )
 
-        postnet_mel = preds["postnet_output"][0].cpu().numpy()
+        postnet_mel = preds["postnet_output"][0]
         durations = preds["dur_rounded"][0].cpu().numpy()
         pitch = preds["pitch_pred"][0].cpu().numpy()
         energy = preds["energy_pred"][0].cpu().numpy()
 
-        # Invert predicted Mel-spectrogram to audio waveform via Griffin-Lim
         wav_path = os.path.join(audio_out_dir, f"{sample_id}.wav")
-        audio = ap.mel_to_audio(postnet_mel)
+        if args.vocoder == "hifigan" and vocoder is not None:
+            audio = vocoder.infer(postnet_mel, device=device)
+        else:
+            audio = ap.mel_to_audio(postnet_mel.cpu().numpy())
 
         sf.write(wav_path, audio, config["audio"]["sampling_rate"], subtype="PCM_16")
         print(f"[*] [{sample_id}] Generated audio: {wav_path} (Duration: {len(audio)/config['audio']['sampling_rate']:.2f}s)")

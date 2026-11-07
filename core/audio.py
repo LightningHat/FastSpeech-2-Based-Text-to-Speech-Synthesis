@@ -100,22 +100,23 @@ class AudioProcessor:
         return f0.astype(np.float32)
 
     def mel_to_audio(self, mel, n_iter=64):
-        """Invert log-mel spectrogram [T, n_mels] to waveform via fast Griffin-Lim."""
+        """Invert log-mel spectrogram [T, n_mels] to waveform via NNLS-based Griffin-Lim."""
         if isinstance(mel, torch.Tensor):
             mel = mel.detach().squeeze().cpu().numpy()
         mel = mel.T  # [n_mels, T]
-        mel_spectrogram = np.exp(mel)
-        # Mild spectral sharpening (power=1.15) reduces over-smoothing buzz in non-autoregressive TTS
-        linear_spec = np.maximum(1e-5, np.dot(self.inv_mel_basis, mel_spectrogram)) ** 1.15
-        audio = librosa.griffinlim(
-            linear_spec,
-            n_iter=n_iter,
+        mel_power = np.exp(mel)
+
+        audio = librosa.feature.inverse.mel_to_audio(
+            mel_power,
+            sr=self.sampling_rate,
+            n_fft=self.n_fft,
             hop_length=self.hop_length,
             win_length=self.win_length,
-            window="hann",
-            momentum=0.99,
+            power=1.0,
+            n_iter=n_iter,
+            fmin=self.fmin,
+            fmax=self.fmax,
         )
-        # Peak normalize to -1 dBFS
         peak = np.max(np.abs(audio))
         if peak > 1e-4:
             audio = (audio / peak) * 0.89
